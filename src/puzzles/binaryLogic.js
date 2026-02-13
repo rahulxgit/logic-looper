@@ -1,15 +1,29 @@
 import BasePuzzle from "./basePuzzle";
 
 class BinaryLogic extends BasePuzzle {
-  generate() {
-    this.question = "1 AND 0 = ?";
-    this.answer = 0;
+  constructor(seed) {
+    super(seed);
+    this.type = "binary";
+    this.difficulty = "easy";
+  }
 
-    return { question: this.question };
+  generate() {
+    this.question = "What is 1 AND 0 ?";
+    this.answer = "0";
+
+    return {
+      question: this.question,
+      type: this.type,
+      difficulty: this.difficulty,
+    };
   }
 
   validate(input) {
-    return Number(input) === this.answer;
+    return input === this.answer;
+  }
+
+  getHint() {
+    return "AND returns 1 only if both values are 1.";
   }
 }
 

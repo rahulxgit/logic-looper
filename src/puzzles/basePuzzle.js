@@ -1,14 +1,33 @@
 class BasePuzzle {
   constructor(seed) {
     this.seed = seed;
+    this.question = "";
+    this.answer = null;
+    this.type = "generic";
+    this.difficulty = "easy";
   }
 
+  /*
+    Every puzzle must implement
+  */
   generate() {
-    throw new Error("Generate method not implemented");
+    throw new Error("generate() must be implemented");
   }
 
-  validate() {
-    throw new Error("Validate method not implemented");
+  validate(input) {
+    return input === this.answer;
+  }
+
+  getHint() {
+    return "No hint available";
+  }
+
+  getDifficulty() {
+    return this.difficulty;
+  }
+
+  getType() {
+    return this.type;
   }
 }
 

@@ -1,18 +1,23 @@
 import { useState } from "react";
 import MainLayout from "../layouts/MainLayout";
 import { useDailyPuzzle } from "../hooks/useDailyPuzzle";
-
-import SequencePuzzle from "../components/puzzle/SequencePuzzle";
-import PatternPuzzle from "../components/puzzle/PatternPuzzle";
-import DeductionPuzzle from "../components/puzzle/DeductionPuzzle";
-import BinaryPuzzle from "../components/puzzle/BinaryPuzzle";
-import NumberMatrixPuzzle from "../components/puzzle/NumberMatrixPuzzle";
+import PuzzleRenderer from "../components/PuzzleRenderer";
 
 function Game() {
+
+  // ✅ ALWAYS declare hook first
   const { puzzleData, puzzleInstance, puzzleType } = useDailyPuzzle();
+
+  // debug logs AFTER declaration
+  console.log("TODAY PUZZLE:", puzzleType);
+  console.log("PUZZLE TYPE:", puzzleType);
+  console.log("PUZZLE DATA:", puzzleData);
+  console.log("PUZZLE INSTANCE:", puzzleInstance);
+
+  const [userInput, setUserInput] = useState("");
   const [result, setResult] = useState(null);
 
-  if (!puzzleData) {
+  if (!puzzleData || !puzzleInstance) {
     return (
       <MainLayout>
         <div className="text-center text-white text-lg">
@@ -22,47 +27,42 @@ function Game() {
     );
   }
 
-  const handleSubmit = (input) => {
-    const isCorrect = puzzleInstance.validate(input);
+  const handleSubmit = () => {
+    if (!userInput) return;
+
+    const isCorrect = puzzleInstance.validate(userInput);
     setResult(isCorrect);
-  };
-
-  const renderPuzzle = () => {
-    switch (puzzleType) {
-      case "sequence":
-        return <SequencePuzzle data={puzzleData} onSubmit={handleSubmit} />;
-
-      case "pattern":
-        return <PatternPuzzle data={puzzleData} onSubmit={handleSubmit} />;
-
-      case "deduction":
-        return <DeductionPuzzle data={puzzleData} onSubmit={handleSubmit} />;
-
-      case "binary":
-        return <BinaryPuzzle data={puzzleData} onSubmit={handleSubmit} />;
-
-      case "number":
-        return <NumberMatrixPuzzle data={puzzleData} onSubmit={handleSubmit} />;
-
-      default:
-        return null;
-    }
   };
 
   return (
     <MainLayout>
-      <div className="bg-white p-6 rounded-2xl shadow-xl">
-        <h2 className="text-xl font-semibold mb-4 capitalize text-center">
+      <div className="bg-white p-6 rounded-2xl shadow-xl max-w-2xl mx-auto">
+
+        <h2 className="text-xl font-semibold mb-6 capitalize text-center">
           {puzzleType} Puzzle
         </h2>
 
-        {renderPuzzle()}
+        <PuzzleRenderer
+          puzzleData={puzzleData}
+          userInput={userInput}
+          setUserInput={setUserInput}
+        />
+
+
+        <div className="mt-6 text-center">
+          <button
+            onClick={handleSubmit}
+            className="px-6 py-2 bg-blue-600 text-white rounded-lg"
+          >
+            Submit Answer
+          </button>
+        </div>
+
 
         {result !== null && (
           <div
-            className={`mt-4 text-center font-bold text-lg ${
-              result ? "text-green-600" : "text-red-600"
-            }`}
+            className={`mt-4 text-center font-bold text-lg ${result ? "text-green-600" : "text-red-600"
+              }`}
           >
             {result ? "🎉 Correct!" : "❌ Try Again"}
           </div>

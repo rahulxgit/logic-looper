@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { getDailySeed } from "../utils/seedGenerator";
-import { getTodayPuzzleType } from "../utils/getPuzzleType";
-import { createPuzzle } from "../puzzles/PuzzleFactory";
+import dayjs from "dayjs";
+import { generatePuzzle } from "../puzzles/PuzzleFactory";
+import BinaryLogic from "../puzzles/binaryLogic";
 
 export function useDailyPuzzle() {
   const [puzzleData, setPuzzleData] = useState(null);
@@ -9,14 +9,18 @@ export function useDailyPuzzle() {
   const [puzzleType, setPuzzleType] = useState(null);
 
   useEffect(() => {
-    const seed = getDailySeed();
-    const type = getTodayPuzzleType();
-    const puzzle = createPuzzle(type, seed);
+    const seed = Number(dayjs().format("YYYYMMDD"));
+
+    const { type, instance } = generatePuzzle(seed);
 
     setPuzzleType(type);
-    setPuzzleInstance(puzzle);
-    setPuzzleData(puzzle.generate());
+    setPuzzleInstance(instance);
+    setPuzzleData(instance.generate());
   }, []);
 
-  return { puzzleData, puzzleInstance, puzzleType };
+  return {
+    puzzleData,
+    puzzleInstance,
+    puzzleType,
+  };
 }

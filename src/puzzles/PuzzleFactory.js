@@ -4,24 +4,26 @@ import SequenceSolver from "./sequenceSolver";
 import DeductionGrid from "./deductionGrid";
 import BinaryLogic from "./binaryLogic";
 
-export function createPuzzle(type, seed) {
-  switch (type) {
-    case "number":
-      return new NumberMatrix(seed);
+/*
+  All available puzzles
+*/
+const puzzles = [
+  { type: "number", class: NumberMatrix },
+  { type: "pattern", class: PatternMatch },
+  { type: "sequence", class: SequenceSolver },
+  { type: "deduction", class: DeductionGrid },
+  { type: "binary", class: BinaryLogic },
+];
 
-    case "pattern":
-      return new PatternMatch(seed);
+/*
+  Generate puzzle automatically from seed
+*/
+export function generatePuzzle(seed) {
+  const index = seed % puzzles.length;
+  const SelectedPuzzle = puzzles[index].class;
 
-    case "sequence":
-      return new SequenceSolver(seed);
-
-    case "deduction":
-      return new DeductionGrid(seed);
-
-    case "binary":
-      return new BinaryLogic(seed);
-
-    default:
-      throw new Error("Invalid puzzle type");
-  }
+  return {
+    type: puzzles[index].type,
+    instance: new SelectedPuzzle(seed),
+  };
 }

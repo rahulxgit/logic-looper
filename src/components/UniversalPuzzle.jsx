@@ -1,16 +1,17 @@
-function BinaryPuzzle({ data, userInput, setUserInput }) {
-  console.log("BINARY PUZZLE DATA:", data);
-
-  if (!data) {
-    return <div style={{ color: "black" }}>No puzzle data</div>;
-  }
+function UniversalPuzzle({ puzzleData, userInput, setUserInput }) {
+  if (!puzzleData) return null;
 
   return (
     <div className="space-y-4">
-      
+
+      {/* Puzzle Type */}
+      <div className="text-sm text-gray-500 text-center">
+        {puzzleData.type} • {puzzleData.difficulty}
+      </div>
+
       {/* Question */}
       <div className="text-lg font-semibold text-center text-black">
-        {data.question}
+        {puzzleData.question}
       </div>
 
       {/* Input */}
@@ -25,4 +26,4 @@ function BinaryPuzzle({ data, userInput, setUserInput }) {
   );
 }
 
-export default BinaryPuzzle;
+export default UniversalPuzzle;
