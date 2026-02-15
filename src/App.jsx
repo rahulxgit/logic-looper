@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 
 import { auth } from "./services/firebase";
-import { loginWithGoogle, logout } from "./services/authService";
 
 import Game from "./pages/Game";
 import Login from "./pages/Login";
@@ -34,69 +33,39 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gradient-to-br from-indigo-600 to-purple-700 text-white">
-        
-        {/* 🔝 Navbar */}
-        <nav className="flex justify-between items-center p-4 bg-black/20 backdrop-blur-md">
-          <h1 className="text-xl font-bold">Logic Looper</h1>
-
-          {user ? (
-            <div className="flex items-center gap-4">
-              <span>{user.displayName}</span>
-
-              {user.photoURL && (
-                <img
-                  src={user.photoURL}
-                  alt="profile"
-                  className="w-8 h-8 rounded-full"
-                />
-              )}
-
-              <button
-                onClick={logout}
-                className="bg-red-500 px-3 py-1 rounded"
-              >
-                Logout
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={loginWithGoogle}
-              className="bg-green-500 px-4 py-2 rounded"
-            >
-              Login with Google
-            </button>
-          )}
-        </nav>
+      {/* 🌈 Global Background */}
+      <div className="min-h-screen bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-800 text-white">
 
         {/* 🔀 Routes */}
         <Routes>
-          {/* Home Route */}
+
+          {/* Home → Game */}
           <Route
             path="/"
             element={
               user ? (
                 <Game user={user} />
               ) : (
-                <Navigate to="/login" />
+                <Navigate to="/login" replace />
               )
             }
           />
 
-          {/* Login Route */}
+          {/* Login */}
           <Route
             path="/login"
             element={
               user ? (
-                <Navigate to="/" />
+                <Navigate to="/" replace />
               ) : (
                 <Login />
               )
             }
           />
 
-          {/* 404 Route */}
+          {/* 404 */}
           <Route path="*" element={<NotFound />} />
+
         </Routes>
       </div>
     </BrowserRouter>

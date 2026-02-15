@@ -1,44 +1,104 @@
+/* ============================= */
+/* Root App Container */
+/* ============================= */
 #root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+
+/* ============================= */
+/* Main App Layout */
+/* ============================= */
+.app-layout {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+
+/* ============================= */
+/* Card UI */
+/* ============================= */
+.card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-@keyframes logo-spin {
+
+/* ============================= */
+/* Hover Effects */
+/* ============================= */
+.card-hover {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.card-hover:hover {
+  transform: scale(1.03);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+
+/* ============================= */
+/* Animations */
+/* ============================= */
+.fade-in {
+  animation: fadeIn 0.4s ease-in;
+}
+
+.slide-up {
+  animation: slideUp 0.4s ease-out;
+}
+
+@keyframes fadeIn {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(10px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.card {
-  padding: 2em;
+
+/* ============================= */
+/* Utility Styles */
+/* ============================= */
+.center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.read-the-docs {
-  color: #888;
+.full-screen {
+  min-height: 100vh;
 }
 
 
+/* ============================= */
+/* Responsive Improvements */
+/* ============================= */
+@media (max-width: 768px) {
+  .app-layout {
+    padding: 1rem;
+  }
+
+  .card {
+    padding: 1rem;
+  }
+}
