@@ -4,6 +4,9 @@ An interactive **daily puzzle game platform** designed to enhance logical thinki
 
 This project is built during my **Bluestock Fintech Software Developer Internship**, where I worked on building scalable client-first applications with real-world product architecture.
 
+Built a scalable daily puzzle game platform with streak tracking, scoring system, and client-first architecture during Bluestock Fintech Software Developer Internship. Demonstrates strong frontend architecture, user engagement systems, and performance-based design.
+
+
 ---
 
 ## 🚀 Project Overview
