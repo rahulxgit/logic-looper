@@ -1,5 +1,5 @@
 # 🧠 Logic Looper — Daily Puzzle Game Platform
-uilt a scalable daily puzzle game platform with streak tracking, scoring system, and client-first architecture during Bluestock Fintech Software Developer Internship. Demonstrates strong frontend architecture, user engagement systems, and performance-based design.
+Built a scalable daily puzzle game platform with streak tracking, scoring system, and client-first architecture during Bluestock Fintech Software Developer Internship. Demonstrates strong frontend architecture, user engagement systems, and performance-based design.
 
 This project is built during my **Bluestock Fintech Software Developer Internship**, where I worked on building scalable client-first applications with real-world product architecture.
 
