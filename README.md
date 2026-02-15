@@ -1,18 +1,13 @@
 # 🧠 Logic Looper — Daily Puzzle Game Platform
-
-An interactive **daily puzzle game platform** designed to enhance logical thinking through engaging challenges, streak tracking, and performance-based scoring.
+uilt a scalable daily puzzle game platform with streak tracking, scoring system, and client-first architecture during Bluestock Fintech Software Developer Internship. Demonstrates strong frontend architecture, user engagement systems, and performance-based design.
 
 This project is built during my **Bluestock Fintech Software Developer Internship**, where I worked on building scalable client-first applications with real-world product architecture.
 
-Built a scalable daily puzzle game platform with streak tracking, scoring system, and client-first architecture during Bluestock Fintech Software Developer Internship. Demonstrates strong frontend architecture, user engagement systems, and performance-based design.
-
+Deploy Link - https://logic-looper-mu.vercel.app
 
 ---
-
 ## 🚀 Project Overview
-
 Logic Looper is a highly interactive web application that delivers daily logic-based puzzles with:
-
 - streak tracking
 - scoring system
 - hint management
@@ -23,7 +18,6 @@ Logic Looper is a highly interactive web application that delivers daily logic-b
 The platform focuses on **daily user engagement**, **performance tracking**, and **scalable puzzle rendering systems**.
 
 ---
-
 ## ⭐ Key Features
 
 ### ✅ Daily Puzzle System
@@ -71,9 +65,7 @@ The platform focuses on **daily user engagement**, **performance tracking**, and
 ---
 
 ## 🏗 Architecture
-
 The project follows a **client-first architecture** where most logic runs on the frontend.
-
 
 ### Structure
 
@@ -93,7 +85,6 @@ src/
 
 
 ---
-
 ## 🛠 Tech Stack
 
 ### Frontend
