@@ -157,7 +157,7 @@ During this internship, I worked on:
 
 - Full Stack Developer
 - DSA Enthusiast (LeetCode 1800+)
-- Biomedical Engineering — NIT Raipur
+- NIT Raipur
 - GitHub: https://github.com/rahulxgit
 - LinkedIn: https://linkedin.com/in/rahulxnit
 
