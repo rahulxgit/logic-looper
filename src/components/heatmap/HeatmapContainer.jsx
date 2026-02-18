@@ -7,6 +7,44 @@ import { buildHeatmapGrid } from "../../services/heatmapService"
 // UI components
 import HeatmapGrid from "./HeatmapGrid"
 import HeatmapLegend from "./HeatmapLegend"
+import HeatmapMonths from "./HeatmapMonths"
+import HeatmapDays from "./HeatmapDays"
+
+/**
+ * ============================================
+ * HEATMAP UI COMPONENT (GITHUB STYLE LAYOUT)
+ * ============================================
+ *
+ * - month labels
+ * - day labels
+ * - grid
+ * - legend
+ * - clean presentation layer
+ */
+export function Heatmap({ weeks }) {
+  return (
+    <div className="p-4 border rounded-lg bg-white shadow-sm">
+
+      {/* Month labels */}
+      <div className="ml-8">
+        <HeatmapMonths weeks={weeks} />
+      </div>
+
+      <div className="flex">
+        {/* Day labels */}
+        <HeatmapDays />
+
+        {/* Heatmap grid */}
+        <HeatmapGrid weeks={weeks} />
+      </div>
+
+      {/* Legend */}
+      <div className="mt-3">
+        <HeatmapLegend />
+      </div>
+    </div>
+  )
+}
 
 /**
  * ============================================
@@ -18,13 +56,18 @@ import HeatmapLegend from "./HeatmapLegend"
  * - auto refresh when puzzle completed
  * - process activity → heatmap grid
  * - memoized performance optimization
+ * - year support
  * - safe error handling
+ * - real-time updates
  */
 
 export default function HeatmapContainer() {
   const [activity, setActivity] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+
+  // production: year-based grid (future ready)
+  const currentYear = new Date().getFullYear()
 
   /**
    * Load activity from IndexedDB
@@ -47,11 +90,13 @@ export default function HeatmapContainer() {
 
   /**
    * Initial load + auto refresh listener
+   * - puzzle solve
+   * - activity update
+   * - cross component sync
    */
   useEffect(() => {
     loadActivity()
 
-    // listen when puzzle completion updates activity
     window.addEventListener("activityUpdated", loadActivity)
 
     return () => {
@@ -64,8 +109,8 @@ export default function HeatmapContainer() {
    * memoized for performance
    */
   const heatmapGrid = useMemo(() => {
-    return buildHeatmapGrid(activity)
-  }, [activity])
+    return buildHeatmapGrid(activity, currentYear)
+  }, [activity, currentYear])
 
   /**
    * Loading UI
@@ -96,8 +141,8 @@ export default function HeatmapContainer() {
     <div className="p-4 border border-white/20 rounded-lg bg-white/5">
       <h2 className="font-semibold mb-3">Your Activity</h2>
 
-      <HeatmapGrid grid={heatmapGrid} />
-      <HeatmapLegend />
+      {/* GitHub style heatmap */}
+      <Heatmap weeks={heatmapGrid} />
     </div>
   )
 }
