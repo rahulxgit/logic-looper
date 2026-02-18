@@ -1,10 +1,12 @@
 import { useEffect, useState, useMemo } from "react"
 
-// ✅ use relative paths (Vite project)
+// services
 import { getAllActivity } from "../../services/indexedDB"
 import { buildHeatmapGrid } from "../../services/heatmapService"
 
+// UI components
 import HeatmapGrid from "./HeatmapGrid"
+import HeatmapLegend from "./HeatmapLegend"
 
 /**
  * ============================================
@@ -13,29 +15,48 @@ import HeatmapGrid from "./HeatmapGrid"
  *
  * Responsibilities:
  * - fetch IndexedDB activity
- * - process data → heatmap grid
+ * - auto refresh when puzzle completed
+ * - process activity → heatmap grid
  * - memoized performance optimization
- * - pass data to UI grid
+ * - safe error handling
  */
 
 export default function HeatmapContainer() {
   const [activity, setActivity] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
 
   /**
    * Load activity from IndexedDB
    */
-  useEffect(() => {
-    async function loadActivity() {
-      try {
-        const data = await getAllActivity()
-        setActivity(data || [])
-      } catch (error) {
-        console.error("Failed to load activity:", error)
-        setActivity([])
-      }
-    }
+  const loadActivity = async () => {
+    try {
+      setLoading(true)
+      setError(null)
 
+      const data = await getAllActivity()
+      setActivity(data || [])
+    } catch (err) {
+      console.error("Failed to load activity:", err)
+      setError("Failed to load activity")
+      setActivity([])
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  /**
+   * Initial load + auto refresh listener
+   */
+  useEffect(() => {
     loadActivity()
+
+    // listen when puzzle completion updates activity
+    window.addEventListener("activityUpdated", loadActivity)
+
+    return () => {
+      window.removeEventListener("activityUpdated", loadActivity)
+    }
   }, [])
 
   /**
@@ -46,11 +67,37 @@ export default function HeatmapContainer() {
     return buildHeatmapGrid(activity)
   }, [activity])
 
+  /**
+   * Loading UI
+   */
+  if (loading) {
+    return (
+      <div className="p-4 border border-white/20 rounded-lg bg-white/5">
+        <p className="text-sm opacity-70">Loading activity...</p>
+      </div>
+    )
+  }
+
+  /**
+   * Error UI
+   */
+  if (error) {
+    return (
+      <div className="p-4 border border-red-300 rounded-lg bg-red-50 text-red-600">
+        {error}
+      </div>
+    )
+  }
+
+  /**
+   * Render heatmap
+   */
   return (
     <div className="p-4 border border-white/20 rounded-lg bg-white/5">
       <h2 className="font-semibold mb-3">Your Activity</h2>
 
       <HeatmapGrid grid={heatmapGrid} />
+      <HeatmapLegend />
     </div>
   )
 }

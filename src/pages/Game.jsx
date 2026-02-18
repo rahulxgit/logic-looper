@@ -1,121 +1,160 @@
-import { useState, useEffect } from "react";
-import MainLayout from "../layouts/MainLayout";
-import { useDailyPuzzle } from "../hooks/useDailyPuzzle";
-import { checkDailyReset } from "../utils/dailyReset";
-import { updateStreak } from "../features/streak/streakService";
-import PuzzleRenderer from "../components/PuzzleRenderer";
-import { calculateScore } from "../utils/scoring";
+import { useState, useEffect, useRef } from "react"
+import { useDailyPuzzle } from "../hooks/useDailyPuzzle"
+import { checkDailyReset } from "../utils/dailyReset"
+import { updateStreak } from "../features/streak/streakService"
+import PuzzleRenderer from "../components/PuzzleRenderer"
+import { calculateScore } from "../utils/scoring"
+
+/**
+ * ============================================
+ * GAME PAGE — PRODUCTION VERSION
+ * ============================================
+ *
+ * Features:
+ * - daily reset check
+ * - puzzle solving system
+ * - score calculation
+ * - streak tracking
+ * - auto heatmap update
+ * - duplicate submission prevention
+ * - clean page-only layout (no navbar)
+ */
 
 function Game() {
-  // ✅ Daily reset when game loads
+  /**
+   * Daily reset when game loads
+   */
   useEffect(() => {
-    checkDailyReset();
-  }, []);
+    checkDailyReset()
+  }, [])
 
-  // ✅ Get today's puzzle
-  const { puzzleData, puzzleInstance, puzzleType } = useDailyPuzzle();
+  /**
+   * Get today's puzzle
+   */
+  const {
+    puzzleData,
+    puzzleInstance,
+    puzzleType,
+    handlePuzzleComplete, // ⭐ important
+  } = useDailyPuzzle()
 
-  // State
-  const [userInput, setUserInput] = useState("");
-  const [result, setResult] = useState(null);
-  const [startTime] = useState(Date.now());
-  const [score, setScore] = useState(null);
-  const [isSolved, setIsSolved] = useState(false); // prevent multiple streak updates
+  /**
+   * State
+   */
+  const [userInput, setUserInput] = useState("")
+  const [result, setResult] = useState(null)
+  const [score, setScore] = useState(null)
+  const [isSolved, setIsSolved] = useState(false)
 
-  // Loading state
+  const startTimeRef = useRef(Date.now())
+
+  /**
+   * Loading state
+   */
   if (!puzzleData || !puzzleInstance) {
     return (
-      <MainLayout>
-        <div className="center full-screen text-gray-900 text-lg">
-          Loading Puzzle...
-        </div>
-      </MainLayout>
-    );
+      <div className="flex items-center justify-center min-h-[60vh] text-lg">
+        Loading Puzzle...
+      </div>
+    )
   }
 
-  // ✅ Submit answer
-  const handleSubmit = () => {
-    if (!userInput?.trim()) return;
-
-    // prevent re-submitting after solved
-    if (isSolved) return;
+  /**
+   * Submit Answer
+   */
+  const handleSubmit = async () => {
+    if (!userInput?.trim()) return
+    if (isSolved) return
 
     try {
-      const isCorrect = puzzleInstance.validate(userInput.trim());
-      setResult(isCorrect);
+      const isCorrect = puzzleInstance.validate(userInput.trim())
+      setResult(isCorrect)
 
-      // If correct → calculate score + update streak (only once)
       if (isCorrect) {
-        setIsSolved(true);
+        setIsSolved(true)
 
-        const timeTaken = Math.floor((Date.now() - startTime) / 1000);
+        const timeTaken = Math.floor(
+          (Date.now() - startTimeRef.current) / 1000
+        )
 
         const finalScore = calculateScore({
           timeTaken,
           hintsUsed: Number(localStorage.getItem("hintsUsed")) || 0,
-        });
+        })
 
-        setScore(finalScore);
-        updateStreak();
+        setScore(finalScore)
+
+        // update streak
+        updateStreak()
+
+        // ⭐ STEP 2 tracking (IndexedDB + heatmap update)
+        await handlePuzzleComplete({
+          score: finalScore,
+          difficulty: puzzleType || "medium",
+        })
       }
     } catch (err) {
-      console.error("Validation error:", err);
+      console.error("Validation error:", err)
     }
-  };
+  }
 
+  /**
+   * UI
+   */
   return (
-    <MainLayout>
-      <div className="app-layout">
-        <div className="card fade-in max-w-2xl mx-auto text-center">
+    <div className="max-w-3xl mx-auto">
 
-          {/* Puzzle Title */}
-          <h2 className="text-xl font-semibold mb-6 capitalize">
-            {puzzleType} Puzzle
-          </h2>
+      {/* Puzzle Card */}
+      <div className="bg-white rounded-xl shadow-md p-8 text-center">
 
-          {/* Puzzle UI */}
-          <PuzzleRenderer
-            puzzleData={puzzleData}
-            userInput={userInput}
-            setUserInput={setUserInput}
-          />
+        {/* Title */}
+        <h2 className="text-xl font-semibold mb-6 capitalize">
+          {puzzleType} Puzzle
+        </h2>
 
-          {/* Submit Button */}
-          <div className="mt-6">
-            <button
-              onClick={handleSubmit}
-              disabled={isSolved}
-              className={`px-6 py-2 text-white rounded-lg transition ${
-                isSolved
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700"
-              }`}
-            >
-              Submit Answer
-            </button>
-          </div>
+        {/* Puzzle Renderer */}
+        <PuzzleRenderer
+          puzzleData={puzzleData}
+          userInput={userInput}
+          setUserInput={setUserInput}
+        />
 
-          {/* Result Message */}
-          {result !== null && (
-            <div
-              className={`mt-5 text-lg font-bold ${
-                result ? "text-green-500" : "text-red-500"
-              }`}
-            >
-              {result ? "🎉 Correct!" : "❌ Try Again"}
-            </div>
-          )}
-
-          {/* Score Display */}
-          {score !== null && (
-            <div className="mt-3 text-yellow-500 font-semibold">
-              ⭐ Score: {score}
-            </div>
-          )}
+        {/* Submit Button */}
+        <div className="mt-6">
+          <button
+            onClick={handleSubmit}
+            disabled={isSolved}
+            className={`px-6 py-2 rounded-lg text-white transition ${
+              isSolved
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-indigo-600 hover:bg-indigo-700"
+            }`}
+          >
+            {isSolved ? "Solved ✓" : "Submit Answer"}
+          </button>
         </div>
+
+        {/* Result Message */}
+        {result !== null && (
+          <div
+            className={`mt-5 text-lg font-bold ${
+              result ? "text-green-500" : "text-red-500"
+            }`}
+          >
+            {result ? "🎉 Correct!" : "❌ Try Again"}
+          </div>
+        )}
+
+        {/* Score */}
+        {score !== null && (
+          <div className="mt-3 text-yellow-500 font-semibold">
+            ⭐ Score: {score}
+          </div>
+        )}
+
       </div>
-    </MainLayout>
-  );
+    </div>
+  )
 }
 
-export default Game;
+export default Game
