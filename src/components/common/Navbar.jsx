@@ -11,7 +11,7 @@ import { getStreak } from "../../features/streak/streakService"
  *
  * Features:
  * - auth state listener
- * - streak counter
+ * - IndexedDB streak counter (production)
  * - online/offline indicator
  * - profile display
  * - logout handling
@@ -26,7 +26,9 @@ function Navbar() {
   const [isOnline, setIsOnline] = useState(navigator.onLine)
 
   /**
+   * ============================================
    * Auth listener
+   * ============================================
    */
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, setUser)
@@ -34,13 +36,25 @@ function Navbar() {
   }, [])
 
   /**
-   * Streak updates
+   * ============================================
+   * PRODUCTION STREAK ENGINE (IndexedDB based)
+   *
+   * Updates:
    * - on mount
    * - when activity updates
-   * - when localStorage changes
+   * - when localStorage changes (cross tab)
+   * ============================================
    */
   useEffect(() => {
-    const update = () => setStreak(getStreak())
+    async function update() {
+      try {
+        const value = await getStreak()
+        setStreak(value)
+      } catch (err) {
+        console.error("Streak update error:", err)
+        setStreak(0)
+      }
+    }
 
     update()
 
@@ -54,7 +68,9 @@ function Navbar() {
   }, [])
 
   /**
+   * ============================================
    * Online / Offline status
+   * ============================================
    */
   useEffect(() => {
     const goOnline = () => setIsOnline(true)
@@ -70,7 +86,9 @@ function Navbar() {
   }, [])
 
   /**
+   * ============================================
    * Logout handler
+   * ============================================
    */
   const handleLogout = async () => {
     if (loggingOut) return
