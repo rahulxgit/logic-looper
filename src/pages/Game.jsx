@@ -26,6 +26,7 @@ function Game() {
    */
   useEffect(() => {
     checkDailyReset()
+    startTimeRef.current = Date.now()
   }, [])
 
   /**
@@ -46,7 +47,7 @@ function Game() {
   const [score, setScore] = useState(null)
   const [isSolved, setIsSolved] = useState(false)
 
-  const startTimeRef = useRef(Date.now())
+  const startTimeRef = useRef(null)
 
   /**
    * Loading state
@@ -74,7 +75,7 @@ function Game() {
         setIsSolved(true)
 
         const timeTaken = Math.floor(
-          (Date.now() - startTimeRef.current) / 1000
+          (Date.now() - (startTimeRef.current || Date.now())) / 1000
         )
 
         const finalScore = calculateScore({

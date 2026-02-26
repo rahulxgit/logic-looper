@@ -83,11 +83,13 @@ export function useDailyPuzzle() {
    * ============================================
    */
   useEffect(() => {
-    mountedRef.current = true
-    generateDailyPuzzle()
+    const timeoutId = window.setTimeout(() => {
+      generateDailyPuzzle()
+    }, 0)
 
     return () => {
       mountedRef.current = false
+      window.clearTimeout(timeoutId)
     }
   }, [generateDailyPuzzle])
 

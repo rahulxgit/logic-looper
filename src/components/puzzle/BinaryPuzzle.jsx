@@ -2,7 +2,7 @@ import { useState } from "react";
 import useHint from "../../hooks/useHint";
 
 function BinaryPuzzle({ data, userInput, setUserInput }) {
-  const { hintsLeft, useHint } = useHint();
+  const { hintsLeft, useHint: consumeHint } = useHint();
   const [hintMessage, setHintMessage] = useState("");
 
   // Safety check
@@ -16,7 +16,7 @@ function BinaryPuzzle({ data, userInput, setUserInput }) {
 
   // Handle hint click
   const handleHint = () => {
-    const allowed = useHint();
+    const allowed = consumeHint();
 
     if (!allowed) {
       setHintMessage("❌ No hints left today!");

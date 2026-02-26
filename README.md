@@ -6,6 +6,11 @@ This project is built during my **Bluestock Fintech Software Developer Internshi
 Deploy Link - https://logic-looper-mu.vercel.app
 
 ---
+
+## 🗺 Execution Roadmap
+- Detailed implementation plan: `docs/PROJECT_ROADMAP.md`
+
+---
 ## 🚀 Project Overview
 Logic Looper is a highly interactive web application that delivers daily logic-based puzzles with:
 - streak tracking
