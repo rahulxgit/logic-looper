@@ -5,52 +5,24 @@ import { updateStreak } from "../features/streak/streakService"
 import PuzzleRenderer from "../components/PuzzleRenderer"
 import { calculateScore } from "../utils/scoring"
 
-/**
- * ============================================
- * GAME PAGE — PRODUCTION VERSION
- * ============================================
- *
- * Features:
- * - daily reset check
- * - puzzle solving system
- * - score calculation
- * - streak tracking
- * - auto heatmap update
- * - duplicate submission prevention
- * - clean page-only layout (no navbar)
- */
-
 function Game() {
-  /**
-   * Daily reset when game loads
-   */
   useEffect(() => {
     checkDailyReset()
   }, [])
 
-  /**
-   * Get today's puzzle
-   */
   const {
     puzzleData,
     puzzleInstance,
     puzzleType,
-    handlePuzzleComplete, // ⭐ important
+    handlePuzzleComplete,
+    getElapsedTime,
   } = useDailyPuzzle()
 
-  /**
-   * State
-   */
   const [userInput, setUserInput] = useState("")
   const [result, setResult] = useState(null)
   const [score, setScore] = useState(null)
   const [isSolved, setIsSolved] = useState(false)
 
-  const startTimeRef = useRef(null)
-
-  /**
-   * Loading state
-   */
   if (!puzzleData || !puzzleInstance) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] text-lg">
@@ -59,23 +31,19 @@ function Game() {
     )
   }
 
-  /**
-   * Submit Answer
-   */
   const handleSubmit = async () => {
-    if (!userInput?.trim()) return
+    if (!userInput?.toString().trim()) return
     if (isSolved) return
 
     try {
-      const isCorrect = puzzleInstance.validate(userInput.trim())
+      const isCorrect = puzzleInstance.validate(userInput.toString().trim())
       setResult(isCorrect)
 
       if (isCorrect) {
         setIsSolved(true)
 
-        const timeTaken = Math.floor(
-          (Date.now() - startTimeRef.current) / 1000
-        )
+        // Use the hook's elapsed time — no separate startTimeRef needed
+        const timeTaken = getElapsedTime()
 
         const finalScore = calculateScore({
           timeTaken,
@@ -84,10 +52,8 @@ function Game() {
 
         setScore(finalScore)
 
-        // update streak
         updateStreak()
 
-        // ⭐ STEP 2 tracking (IndexedDB + heatmap update)
         await handlePuzzleComplete({
           score: finalScore,
           difficulty: puzzleType || "medium",
@@ -98,28 +64,20 @@ function Game() {
     }
   }
 
-  /**
-   * UI
-   */
   return (
     <div className="max-w-3xl mx-auto">
-
-      {/* Puzzle Card */}
       <div className="bg-white rounded-xl shadow-md p-8 text-center">
 
-        {/* Title */}
         <h2 className="text-xl font-semibold mb-6 capitalize">
           {puzzleType} Puzzle
         </h2>
 
-        {/* Puzzle Renderer */}
         <PuzzleRenderer
           puzzleData={puzzleData}
           userInput={userInput}
           setUserInput={setUserInput}
         />
 
-        {/* Submit Button */}
         <div className="mt-6">
           <button
             onClick={handleSubmit}
@@ -134,7 +92,6 @@ function Game() {
           </button>
         </div>
 
-        {/* Result Message */}
         {result !== null && (
           <div
             className={`mt-5 text-lg font-bold ${
@@ -145,7 +102,6 @@ function Game() {
           </div>
         )}
 
-        {/* Score */}
         {score !== null && (
           <div className="mt-3 text-yellow-500 font-semibold">
             ⭐ Score: {score}

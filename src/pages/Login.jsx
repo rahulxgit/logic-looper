@@ -1,16 +1,17 @@
 import { useState } from "react";
-import { loginWithGoogle } from "../services/authService";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth } from "../services/firebase";
 
 function Login() {
   const [loading, setLoading] = useState(false);
 
-  // Safe login handler
   const handleLogin = async () => {
     if (loading) return;
 
     try {
       setLoading(true);
-      await loginWithGoogle();
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
     } catch (err) {
       console.error("Login failed:", err);
       alert("Login failed. Please try again.");
@@ -24,12 +25,10 @@ function Login() {
 
       <div className="bg-white text-gray-900 p-8 rounded-2xl shadow-xl text-center w-full max-w-[350px]">
 
-        {/* App Title */}
         <h1 className="text-2xl font-bold mb-6">
           Logic Looper
         </h1>
 
-        {/* Login Button */}
         <button
           onClick={handleLogin}
           disabled={loading}

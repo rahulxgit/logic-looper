@@ -1,21 +1,23 @@
 import { useState } from "react";
 
 export default function useHint(limit = 3) {
-  const [hintsLeft, setHintsLeft] = useState(
+  // Initialize from used count (reset daily by checkDailyReset)
+  const [hintsUsed, setHintsUsed] = useState(
     Number(localStorage.getItem("hintsUsed")) || 0
   );
 
-  const useHint = () => {
-    if (hintsLeft >= limit) return false;
+  const useHintAction = () => {
+    if (hintsUsed >= limit) return false;
 
-    const newCount = hintsLeft + 1;
-    setHintsLeft(newCount);
-    localStorage.setItem("hintsUsed", newCount);
+    const newUsed = hintsUsed + 1;
+    setHintsUsed(newUsed);
+    localStorage.setItem("hintsUsed", newUsed);
     return true;
   };
 
   return {
-    hintsLeft: limit - hintsLeft,
-    useHint,
+    hintsLeft: limit - hintsUsed,
+    hintsUsed,
+    useHint: useHintAction,
   };
 }
