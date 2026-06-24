@@ -1,148 +1,112 @@
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo } from "react";
+import dayjs from "dayjs";
+import { getAllActivity } from "../../services/indexedDB";
 
-// services
-import { getAllActivity } from "../../services/indexedDB"
-import { buildHeatmapGrid } from "../../services/heatmapService"
+const intensityClass = {
+  0: "bg-gray-200 dark:bg-gray-700",
+  1: "bg-green-200",
+  2: "bg-green-400",
+  3: "bg-green-600",
+  4: "bg-green-800"
+};
 
-// UI components
-import HeatmapGrid from "./HeatmapGrid"
-import HeatmapLegend from "./HeatmapLegend"
-import HeatmapMonths from "./HeatmapMonths"
-import HeatmapDays from "./HeatmapDays"
-
-/**
- * ============================================
- * HEATMAP UI COMPONENT (GITHUB STYLE LAYOUT)
- * ============================================
- *
- * - month labels
- * - day labels
- * - grid
- * - legend
- * - clean presentation layer
- */
-export function Heatmap({ weeks }) {
-  return (
-    <div className="p-4 border rounded-lg bg-white shadow-sm">
-
-      {/* Month labels */}
-      <div className="ml-8">
-        <HeatmapMonths weeks={weeks} />
-      </div>
-
-      <div className="flex">
-        {/* Day labels */}
-        <HeatmapDays />
-
-        {/* Heatmap grid */}
-        <HeatmapGrid weeks={weeks} />
-      </div>
-
-      {/* Legend */}
-      <div className="mt-3">
-        <HeatmapLegend />
-      </div>
-    </div>
-  )
+function getIntensity(activity) {
+  if (!activity?.solved) return 0;
+  if (activity.score >= 100 && activity.difficulty === "hard") return 4;
+  if (activity.difficulty === "hard") return 3;
+  if (activity.difficulty === "medium") return 2;
+  return 1;
 }
 
-/**
- * ============================================
- * HEATMAP CONTAINER — PRODUCTION VERSION
- * ============================================
- *
- * Responsibilities:
- * - fetch IndexedDB activity
- * - auto refresh when puzzle completed
- * - process activity → heatmap grid
- * - memoized performance optimization
- * - year support
- * - safe error handling
- * - real-time updates
- */
+export function Heatmap({ activityMap }) {
+  const { weeks } = useMemo(() => {
+    const start = dayjs().startOf("year");
+    const total = dayjs().isLeapYear() ? 366 : 365;
+    const today = dayjs().format("YYYY-MM-DD");
+
+    const cells = [];
+    for (let i = 0; i < total; i++) {
+      const date = start.add(i, "day");
+      const key = date.format("YYYY-MM-DD");
+      cells.push({
+        date: key,
+        label: date.format("MMM D"),
+        isToday: key === today,
+        activity: activityMap[key]
+      });
+    }
+
+    const weeks = [];
+    for (let i = 0; i < cells.length; i += 7) {
+      weeks.push(cells.slice(i, i + 7));
+    }
+    return { cells, weeks };
+  }, [activityMap]);
+
+  return (
+    <div className="flex gap-1 overflow-x-auto pb-2">
+      {weeks.map((week, wi) => (
+        <div key={wi} className="flex flex-col gap-1">
+          {week.map(({ date, label, isToday, activity }) => (
+            <div
+              key={date}
+              title={`${label}: Score ${activity?.score ?? 0}`}
+              style={{
+                transition: "all 0.15s"
+              }}
+              className={`
+                w-3 h-3 rounded-sm cursor-pointer
+                ${intensityClass[getIntensity(activity)]}
+                ${isToday ? "ring-2 ring-indigo-500" : ""}
+                hover:scale-125 hover:z-10
+              `}
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
 
 export default function HeatmapContainer() {
-  const [activity, setActivity] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
+  const [activityMap, setActivityMap] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  // production: year-based grid (future ready)
-  const currentYear = new Date().getFullYear()
-
-  /**
-   * Load activity from IndexedDB
-   */
   const loadActivity = async () => {
     try {
-      setLoading(true)
-      setError(null)
-
-      const data = await getAllActivity()
-      setActivity(data || [])
+      setLoading(true);
+      const data = await getAllActivity();
+      const map = {};
+      data.forEach(item => {
+        map[item.date] = item;
+      });
+      setActivityMap(map);
     } catch (err) {
-      console.error("Failed to load activity:", err)
-      setError("Failed to load activity")
-      setActivity([])
+      console.error("Failed to load activity:", err);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  /**
-   * Initial load + auto refresh listener
-   * - puzzle solve
-   * - activity update
-   * - cross component sync
-   */
   useEffect(() => {
-    loadActivity()
-
-    window.addEventListener("activityUpdated", loadActivity)
-
+    loadActivity();
+    window.addEventListener("activityUpdated", loadActivity);
     return () => {
-      window.removeEventListener("activityUpdated", loadActivity)
-    }
-  }, [])
+      window.removeEventListener("activityUpdated", loadActivity);
+    };
+  }, []);
 
-  /**
-   * Convert activity → heatmap grid
-   * memoized for performance
-   */
-  const heatmapGrid = useMemo(() => {
-    return buildHeatmapGrid(activity, currentYear)
-  }, [activity, currentYear])
-
-  /**
-   * Loading UI
-   */
   if (loading) {
     return (
       <div className="p-4 border border-white/20 rounded-lg bg-white/5">
         <p className="text-sm opacity-70">Loading activity...</p>
       </div>
-    )
+    );
   }
 
-  /**
-   * Error UI
-   */
-  if (error) {
-    return (
-      <div className="p-4 border border-red-300 rounded-lg bg-red-50 text-red-600">
-        {error}
-      </div>
-    )
-  }
-
-  /**
-   * Render heatmap
-   */
   return (
     <div className="p-4 border border-white/20 rounded-lg bg-white/5">
-      <h2 className="font-semibold mb-3">Your Activity</h2>
-
-      {/* GitHub style heatmap */}
-      <Heatmap weeks={heatmapGrid} />
+      <Heatmap activityMap={activityMap} />
     </div>
-  )
+  );
 }

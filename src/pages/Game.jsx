@@ -46,7 +46,7 @@ function Game() {
   const [score, setScore] = useState(null)
   const [isSolved, setIsSolved] = useState(false)
 
-  const startTimeRef = useRef(Date.now())
+  const startTimeRef = useRef(null)
 
   /**
    * Loading state

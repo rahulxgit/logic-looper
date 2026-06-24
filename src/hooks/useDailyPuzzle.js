@@ -69,7 +69,7 @@ export function useDailyPuzzle() {
     // check if already solved today (resume state)
     try {
       const progress = await getTodayProgress()
-      if (progress?.solved) {
+      if (progress?.solved && mountedRef.current) {
         setIsCompleted(true)
       }
     } catch (err) {
@@ -84,7 +84,10 @@ export function useDailyPuzzle() {
    */
   useEffect(() => {
     mountedRef.current = true
-    generateDailyPuzzle()
+    // Push the state update outside of immediate synchronous render
+    setTimeout(() => {
+      generateDailyPuzzle()
+    }, 0);
 
     return () => {
       mountedRef.current = false

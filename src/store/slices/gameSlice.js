@@ -89,7 +89,7 @@ const gameSlice = createSlice({
     },
 
     // Daily reset
-    resetDaily: (state) => {
+    resetDaily: () => {
       return initialState
     },
 
