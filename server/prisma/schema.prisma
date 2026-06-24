@@ -8,9 +8,33 @@ datasource db {
 }
 
 model User {
-  id           String   @id @default(uuid())
-  email        String   @unique
-  streak_count Int      @default(0)
-  last_played  DateTime?
-  total_points Int      @default(0)
+  id           String       @id @default(uuid())
+  email        String       @unique
+  streakCount  Int          @default(0)
+  lastPlayed   DateTime?
+  totalPoints  Int          @default(0)
+  dailyScores  DailyScore[]
+  createdAt    DateTime     @default(now())
+  userStats    UserStats?
+}
+
+model UserStats {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  puzzlesSolved Int      @default(0)
+  avgSolveTime  Float    @default(0)
+  user          User     @relation(fields: [userId], references: [id])
+}
+
+model DailyScore {
+  id        String   @id @default(uuid())
+  userId    String
+  date      DateTime @db.Date
+  puzzleId  String   // "2026-02-14" — the date-based puzzle ID
+  score     Int
+  timeTaken Int      // seconds
+  user      User     @relation(fields: [userId], references: [id])
+
+  // CRITICAL: One record per user per day — upsert target
+  @@unique([userId, date])
 }

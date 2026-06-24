@@ -3,6 +3,7 @@ import gameReducer from './slices/gameSlice'
 import progressReducer from './slices/progressSlice'
 import userReducer from './slices/userSlice'
 import achievementsReducer from './slices/achievementsSlice'
+import puzzleReducer from './slices/puzzleSlice'
 
 /**
  * ============================================
@@ -26,6 +27,7 @@ export const store = configureStore({
     progress: progressReducer,
     user: userReducer,
     achievements: achievementsReducer,
+    puzzle: puzzleReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -36,7 +38,7 @@ export const store = configureStore({
         ignoredPaths: ['user.currentUser'],
       },
     }),
-  devTools: process.env.NODE_ENV !== 'production',
+  devTools: import.meta.env.MODE !== 'production',
 })
 
 export default store

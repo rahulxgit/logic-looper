@@ -19,7 +19,8 @@ const puzzles = [
   Generate puzzle automatically from seed
 */
 export function generatePuzzle(seed) {
-  const index = seed % puzzles.length;
+  // Simple integer hashing to pick a puzzle
+  const index = Math.abs(seed) % puzzles.length;
   const SelectedPuzzle = puzzles[index].class;
 
   return {

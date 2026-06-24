@@ -1,8 +1,11 @@
 import { useState } from "react";
-import useHint from "../../hooks/useHint";
+import { useDispatch, useSelector } from "react-redux";
+import { useHint as applyHintAction } from "../../store/slices/puzzleSlice";
 
 function BinaryPuzzle({ data, userInput, setUserInput }) {
-  const { hintsLeft, useHint } = useHint();
+  const dispatch = useDispatch();
+  const { hintsUsed } = useSelector(state => state.puzzle);
+  const hintsLeft = 3 - hintsUsed;
   const [hintMessage, setHintMessage] = useState("");
 
   // Safety check
@@ -16,12 +19,12 @@ function BinaryPuzzle({ data, userInput, setUserInput }) {
 
   // Handle hint click
   const handleHint = () => {
-    const allowed = useHint();
-
-    if (!allowed) {
+    if (hintsLeft <= 0) {
       setHintMessage("❌ No hints left today!");
       return;
     }
+
+    dispatch(applyHintAction());
 
     // If your puzzle has hint field
     if (data.hint) {

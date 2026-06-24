@@ -11,6 +11,9 @@ const prisma = new PrismaClient();
 app.use(cors());
 app.use(express.json());
 
+import syncRoutes from "./routes/sync.js";
+app.use("/sync", syncRoutes);
+
 app.get("/", (req, res) => {
   res.send("Backend Running 🚀");
 });
@@ -25,7 +28,7 @@ app.post("/user", async (req, res) => {
     });
 
     res.json(user);
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: "User creation failed" });
   }
 });
