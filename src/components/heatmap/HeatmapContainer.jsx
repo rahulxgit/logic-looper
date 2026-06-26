@@ -1,5 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import dayjs from "dayjs";
+import isLeapYear from "dayjs/plugin/isLeapYear";
+dayjs.extend(isLeapYear);
 import { getAllActivity } from "../../services/indexedDB";
 
 const intensityClass = {
